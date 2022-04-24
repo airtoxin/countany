@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-gql`
+export const typeDefs = gql`
   type Counter {
     id: String!
     name: String!

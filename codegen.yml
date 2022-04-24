@@ -18,7 +18,7 @@ generates:
       - typescript-react-query
     config:
       fetcher:
-        func: "@/reactQueryFetcher#reactQueryFetcher"
+        func: "@/pages/reactQueryFetcher#reactQueryFetcher"
   src/server/models.gen.ts:
     plugins:
       - typescript
