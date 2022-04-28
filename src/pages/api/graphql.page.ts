@@ -2,18 +2,14 @@ import { typeDefs } from "@/schema";
 import { resolvers } from "@/server/resolvers";
 import { createServer } from "@graphql-yoga/node";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Context } from "@/server/resolvers/Context";
+import { createContext } from "@/server/resolvers/Context";
 
 const server = createServer<{
   req: NextApiRequest;
   res: NextApiResponse;
 }>({
   schema: { typeDefs, resolvers },
-  context: async (initialContext): Promise<Context> => {
-    return {
-      ...initialContext,
-    };
-  },
+  context: createContext,
 });
 
 export const config = {

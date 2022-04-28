@@ -6,14 +6,14 @@ export const typeDefs = gql`
     name: String!
     count: Int!
   }
-  
+
   type Query {
-    counter(id: ID!): Counter!
+    counter(id: ID!, name: String!): Counter!
   }
-  
+
   type Mutation {
-    incrementCount(id: ID!): Int!
-    decrementCount(id: ID!): Int!
+    incrementCount(id: ID!, name: String!): Int!
+    decrementCount(id: ID!, name: String!): Int!
     createCounter(name: String!): Counter!
   }
 `;

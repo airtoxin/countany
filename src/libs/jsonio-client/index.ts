@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export class JsonioClient {
   private readonly jsonio = z.string().parse(process.env.JSONIO_URL);
-  constructor(private authToken: string, private fetch = f) {}
+  constructor(private readonly authToken: string, private readonly fetch = f) {}
 
   public async createBucket(bucketName: string) {
     return this.fetch(`${this.jsonio}/api/${encodeURIComponent(bucketName)}`, {
@@ -27,7 +27,7 @@ export class JsonioClient {
       );
   }
 
-  public async createRow<T extends {} = {}>(bucketName: string, json: T) {
+  public async createRow(bucketName: string, json: { count: number }) {
     return this.fetch(`${this.jsonio}/api/${encodeURIComponent(bucketName)}`, {
       method: "POST",
       headers: {
@@ -41,7 +41,9 @@ export class JsonioClient {
         z
           .object({
             id: z.number(),
-            json: z.object({}).passthrough(),
+            json: z.object({
+              count: z.number(),
+            }),
             bucket: z.object({
               name: z.string(),
               createdAt: z
@@ -90,7 +92,9 @@ export class JsonioClient {
             rows: z.array(
               z.object({
                 id: z.number(),
-                json: z.object({}).passthrough(),
+                json: z.object({
+                  count: z.number(),
+                }),
                 createdAt: z
                   .string()
                   .refine((s) => !Number.isNaN(new Date(s).getTime()))
@@ -132,7 +136,56 @@ export class JsonioClient {
         z
           .object({
             id: z.number(),
-            json: z.object({}).passthrough(),
+            json: z.object({
+              count: z.number(),
+            }),
+            bucket: z.object({
+              name: z.string(),
+              createdAt: z
+                .string()
+                .refine((s) => !Number.isNaN(new Date(s).getTime()))
+                .transform((s) => new Date(s)),
+              totalRows: z.number(),
+            }),
+            createdAt: z
+              .string()
+              .refine((s) => !Number.isNaN(new Date(s).getTime()))
+              .transform((s) => new Date(s)),
+            updatedAt: z
+              .string()
+              .refine((s) => !Number.isNaN(new Date(s).getTime()))
+              .transform((s) => new Date(s)),
+          })
+          .parse(data)
+      );
+  }
+
+  public async updateRow(
+    bucketName: string,
+    rowId: number,
+    json: { count: number }
+  ) {
+    return this.fetch(
+      `${this.jsonio}/api/${encodeURIComponent(
+        bucketName
+      )}/${encodeURIComponent(rowId)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer: ${this.authToken}`,
+        },
+        body: JSON.stringify(json),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) =>
+        z
+          .object({
+            id: z.number(),
+            json: z.object({
+              count: z.number(),
+            }),
             bucket: z.object({
               name: z.string(),
               createdAt: z
